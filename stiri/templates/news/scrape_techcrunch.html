@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scraped TechCrunch News</title>
+</head>
+<body>
+    <h1>Scraped TechCrunch News</h1>
+    <ul>
+        {% for article in articles %}
+            <li>
+                <h2>{{ article.title }}</h2>
+                {% if article.author %}
+                    <p>Author: {{ article.author }}</p>
+                {% endif %}
+                {% if article.image %}
+                    <img src="{{ article.image }}" alt="Article Image">
+                {% endif %}
+                <p><a href="{{ article.link }}" target="_blank">Read more</a></p>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

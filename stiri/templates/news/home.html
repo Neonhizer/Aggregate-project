@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stiri</title>
+    <!-- Includeți orice fișiere CSS și resurse suplimentare aici -->
+</head>
+<body>
+<div class="jumbotron">
+    <h1>Stiri</h1>
+    <form method="POST" action="{% url 'scrape' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Actualizare stiri</button>
+    </form>
+</div>
+<div class="container">
+    <div id="news-container" class="card-columns" style="padding: 10px; margin: 20px;">
+        <!-- Aici veți afișa știrile din JavaScript -->
+    </div>
+</div>
+<script
+    src="http://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<script>
+    $(document).ready(function () {
+        // Definește funcția pentru a afișa știrile în container
+        function displayNews(newsData) {
+            var newsContainer = $("#news-container");
+
+            // Curăță conținutul existent al containerului
+            newsContainer.empty();
+
+            // Iterează prin știri și adaugă-le în container
+            for (var i = 0; i < newsData.titles.length; i++) {
+                var newsCard = '<div class="card"><div class="card-body">';
+                newsCard += '<h5 class="card-title"><a href="' + newsData.links[i] + '">' + newsData.titles[i] + '</a></h5>';
+                newsCard += '</div></div>';
+                newsContainer.append(newsCard);
+            }
+        }
+
+        // Faceți o cerere AJAX către server pentru a obține știrile
+        $.ajax({
+            url: "/get_news/", // Aceasta este calea către funcția care extrage știrile din baza de date
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                // Apelează funcția pentru a afișa știrile în container
+                displayNews(data);
+            },
+            error: function () {
+                console.log("Failed to fetch news data.");
+            }
+        });
+    });
+</script>
+</body>
+</html>
