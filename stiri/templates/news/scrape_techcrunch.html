@@ -2,6 +2,30 @@
 <html>
 <head>
     <title>Scraped TechCrunch News</title>
+    <style>
+        ul {
+            list-style: none;
+        }
+
+        li {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        h1 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        p.author {
+            font-style: italic;
+        }
+
+        img {
+            max-width: 100%;
+        }
+    </style>
 </head>
 <body>
     <h1>Scraped TechCrunch News</h1>
@@ -10,7 +34,7 @@
             <li>
                 <h1>{{ article.title }}</h1>
                 {% if article.author %}
-                    <p>Author: {{ article.author }}</p>
+                    <p class="author">Author: {{ article.author }}</p>
                 {% endif %}
                 {% if article.image %}
                     <img src="{{ article.image }}" alt="Article Image">

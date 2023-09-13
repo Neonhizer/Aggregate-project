@@ -4,12 +4,12 @@ from django.shortcuts import render
 from pymongo import MongoClient
 from .models import Article
 from django.http import JsonResponse
-from .models import Article
-# from django.http import HttpResponse
-# from django.conf.urls import url
+
+
 
 
 def scrape_techcrunch(request):
+    
     url = "https://techcrunch.com/"
     response = requests.get(url)
     if response.status_code == 200:
@@ -20,10 +20,17 @@ def scrape_techcrunch(request):
         for article in articles:
             title = article.find('h3').get_text()
             link = article.find('a')['href']
-            image_tag = article.find('img')
-            image = image_tag['src'] if image_tag else ''
-            author_tag = article.find('span', class_='river-byline__authors')
-            author = author_tag.get_text() if author_tag else ''
+            
+            image_element = soup.select_one('figure.post-block__media img')
+            image = image_element['src'] if image_element else None
+            
+
+           
+
+
+            author_element = article.find('p', class_='fi-main-block__byline').find('a', href=True)
+            author = author_element.get_text() if author_element else ''
+            
 
             article_data.append({
                 'title': title,
@@ -31,6 +38,7 @@ def scrape_techcrunch(request):
                 'image': image,
                 'author': author,
             })
+
         context = {
             'articles': article_data,
         }
@@ -43,10 +51,12 @@ def scrape_techcrunch(request):
             news_collection.insert_one(data)
 
     return render(request, 'news/scrape_techcrunch.html', context)
+    
 
 def home(request):
     # Fetch all the articles from the database
     articles = Article.objects.all()
+
 
     context = {
         'articles': articles,
@@ -54,20 +64,20 @@ def home(request):
 
     return render(request, 'news/home.html', context)
 
-
-
 def get_news(request):
     # Extract all the news from the database
     news = Article.objects.all()
 
-
     news_data = {
-        'titles': [Article.title for stire in news],
-        'links': [Article.url for stire in news],
+        'titles': [article.title for article in news],
+        'links': [article.url for article in news],
     }
 
     # Return the data as JSON
     return JsonResponse(news_data)
+
+
+
 
 
 
