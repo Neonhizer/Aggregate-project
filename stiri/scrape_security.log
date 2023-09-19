@@ -1,0 +1,10 @@
+ERROR:root:Failed to fetch data from SecurityWeek. Status code: 403
+WARNING:django.request:Not Found: /scrape_security/
+ERROR:root:Failed to fetch data from SecurityWeek. Status code: 403
+INFO:django.utils.autoreload:C:\Users\rusuv\Desktop\nouuuuu\stiri\news\views.py changed, reloading.
+WARNING:django.request:Not Found: /scrape_security/
+INFO:django.utils.autoreload:C:\Users\rusuv\Desktop\nouuuuu\stiri\news\views.py changed, reloading.
+WARNING:django.request:Not Found: /scrape_decrypt/
+INFO:django.utils.autoreload:C:\Users\rusuv\Desktop\nouuuuu\stiri\news\urls.py changed, reloading.
+INFO:django.utils.autoreload:C:\Users\rusuv\Desktop\nouuuuu\stiri\news\urls.py changed, reloading.
+INFO:django.utils.autoreload:C:\Users\rusuv\Desktop\nouuuuu\stiri\news\views.py changed, reloading.

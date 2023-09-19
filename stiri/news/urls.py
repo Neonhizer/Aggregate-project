@@ -1,10 +1,25 @@
+# from django.urls import path
+# from . import views
+
+# urlpatterns = [
+#     path('', views.home, name='home'),
+#     path('scrape/', views.scrape_techcrunch, name='scrape_techcrunch'),
+#     path('news/scrape_security/', views.scrape_security, name='scrape_security'), 
+    
+
+# ]
+
+
 from django.urls import path
 from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
     path('scrape/', views.scrape_techcrunch, name='scrape'),
-   # path('news/scrape/', views.scrape_news, name='scrape_news'),
+    path('news/scrape_security/', views.scrape_security, name='scrape'),
+    path('get_news/', views.get_news, name='get_news'),  
+    path('scrape_security/', views.scrape_security, name='scrape_security'),
+    path('scrape_decrypt/', views.scrape_decrypt, name='scrape_decrypt'),
     
 ]
 
