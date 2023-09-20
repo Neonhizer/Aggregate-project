@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta tags, title, CSS, etc. -->
+</head>
+<body>
+    <h1>Articole de pe SecurityWeek</h1>
+    <div>
+        {% if message %}
+            <p>{{ message }}</p>
+        {% else %}
+            <!-- Afișează articolele aici, probabil într-o buclă for -->
+            {% for article in article_data %}
+                <h3>{{ article.title }}</h3>
+                <p>{{ article.description }}</p>
+                <!-- Alte detalii ale articolelor -->
+            {% endfor %}
+        {% endif %}
+    </div>
+</body>
+</html>

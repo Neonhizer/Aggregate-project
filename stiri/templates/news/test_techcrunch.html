@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Articole</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Ascunde bara de derulare orizontală */
+        }
+        h1 {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+            margin: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        th {
+            background-color: #333;
+            color: #fff;
+            font-weight: bold;
+        }
+        td img {
+            max-width: 100%;
+            height: auto;
+        }
+        .read-more-link {
+            text-decoration: none;
+            color: #007bff;
+            transition: color 0.3s;
+        }
+        .read-more-link:hover {
+            color: #0056b3;
+        }
+        label {
+            margin: 20px;
+        }
+        select {
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Articole TechCrunch</h1>
+
+ 
+    <label for="filter">Filtru:</label>
+    <select id="filter">
+        <option value="author">Autor (ascendent)</option>
+        <option value="title">Titlu (ascendent)</option>
+    </select>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Imagine</th> 
+                <th>Titlu</th>
+                <th>Autor</th>
+                <th>Detalii</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for article in articole %}
+                <tr>
+                    <td><img src="{{ article.image_url }}" alt="Imagine articol"></td> 
+                    <td>{{ article.title }}</td>
+                    <td>{{ article.author }}</td>
+                    <td><a href="{{ article.article_url }}" class="read-more-link" target="_blank">Citește mai mult</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#filter").change(function () {
+                var filter = $(this).val();
+                var tableBody = $("tbody");
+
+                tableBody.find("tr").hide();
+
+                if (filter === "all") {
+                    tableBody.find("tr").show();
+                } else if (filter === "author") {
+                    tableBody.find("tr").filter(function () {
+                        return $(this).find("td:eq(2)").text() !== "Autor"; 
+                    }).show();
+                } else if (filter === "title") {
+                    tableBody.find("tr").filter(function () {
+                        return $(this).find("td:eq(1)").text() !== "Titlu";
+                    }).show();
+                }
+            });
+
+            $("#filter").change(function () {
+                var sortOption = $(this).val();
+
+                if (sortOption === "author") {
+                    sortArticlesByAuthor();
+                } else if (sortOption === "title") {
+                    sortArticlesByTitle();
+                }
+            });
+
+            function sortArticlesByAuthor() {
+                var tableBody = $("tbody");
+                var rows = tableBody.find("tr").get();
+
+                rows.sort(function (a, b) {
+                    var authorA = $(a).find("td:eq(2)").text().toUpperCase();
+                    var authorB = $(b).find("td:eq(2)").text().toUpperCase();
+
+                    if (authorA < authorB) {
+                        return -1;
+                    }
+                    if (authorA > authorB) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                tableBody.empty();
+                $.each(rows, function (index, row) {
+                    tableBody.append(row);
+                });
+            }
+
+            function sortArticlesByTitle() {
+                var tableBody = $("tbody");
+                var rows = tableBody.find("tr").get();
+
+                rows.sort(function (a, b) {
+                    var titleA = $(a).find("td:eq(1)").text().toUpperCase();
+                    var titleB = $(b).find("td:eq(1)").text().toUpperCase();
+
+                    if (titleA < titleB) {
+                        return -1;
+                    }
+                    if (titleA > titleB) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                tableBody.empty();
+                $.each(rows, function (index, row) {
+                    tableBody.append(row);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

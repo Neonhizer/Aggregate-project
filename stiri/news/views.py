@@ -5,244 +5,10 @@ from pymongo import MongoClient
 from .models import Article
 from django.http import JsonResponse
 from django.http import HttpResponse
-
+import pymongo
 import logging
-
-
-
-# def scrape_techcrunch(request):
-    
-#     url = "https://techcrunch.com/"
-#     response = requests.get(url)
-#     if response.status_code == 200:
-#         soup = BeautifulSoup(response.text, 'html.parser')
-#         articles = soup.find_all('article')
-#         article_data = []
-
-#         for article in articles:
-#             title = article.find('h3').get_text()
-#             link = article.find('a')['href']
-
-#             #image_element = soup.select('figure.post-block__media img')
-#             #image = image_element[0]['src'] if image_element else None
-                        
-
-           
-
-
-#             author_element = article.find('p', class_='fi-main-block__byline').find('a', href=True)
-#             author = author_element.get_text() if author_element else ''
-            
-
-#             article_data.append({
-#                 'title': title,
-#                 'link': link,
-#             #    'image': image,
-#                 'author': author,
-#             })
-
-#         context = {
-#             'articles': article_data,
-#         }
-#         # Save the articles in the MongoDB database
-#         client = MongoClient('localhost', 27017)
-#         db = client['news']
-#         news_collection = db['techcrunch_news']
-
-#         for data in article_data:
-#             news_collection.insert_one(data)
-
-#         return render(request, 'news/test.html', context)
-
-
-
-    
-
-
-
-
-
-
-
-# def scrape_security(request):
-#     url = "https://www.securityweek.com"
-#     response = requests.get(url)
-#     context = {'articles': []}
-
-#     if response.ok and response.status_code == 200:
-#         soup = BeautifulSoup(response.text, 'html.parser')
-#         articles = soup.find_all('article')
-
-#         article_data = []
-
-#         for article in articles:
-#             title_element = article.find('h1', class_='zox-post-title')
-#             title = title_element.get_text() if title_element else ''
-#             print("Titlu:", title)
-
-#             article_data.append({
-#                 'title': title,
-#             })
-
-#         client = MongoClient('localhost', 27017)
-#         db = client['news']
-#         news_collection = db['security_news']
-
-#         for data in article_data:
-#             news_collection.insert_one(data)
-
-#         context['articles'] = article_data
-
-#     return render(request, 'news/scrape_security.html', context)
-
-
-
-def scrape_techcrunch(request):
-    url = "https://techcrunch.com/"
-    response = requests.get(url)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
-        articles = soup.find_all('article')
-        article_data = []
-
-        for article in articles:
-            title = article.find('h3').get_text()
-            link = article.find('a')['href']
-
-            # image_element = soup.select('figure.post-block__media img')
-            # image = image_element[0]['src'] if image_element else None
-
-            author_element = article.find('p', class_='fi-main-block__byline').find('a', href=True)
-            author = author_element.get_text() if author_element else ''
-
-            article_data.append({
-                'title': title,
-                'link': link,
-                # 'image': image,
-                'author': author,
-            })
-
-        context = {
-            'articles': article_data,
-        }
-
-        # Save the articles in the MongoDB database
-        client = MongoClient('localhost', 27017)
-        db = client['news']
-        news_collection = db['techcrunch_news']
-
-        for data in article_data:
-            news_collection.insert_one(data)
-
-        return render(request, 'news/scrape_techcrunch.html', context)
-
-
-
-
-
-
-
-
-
-def scrape_security(request):
-    
-    logging.basicConfig(filename='scrape_security.log', level=logging.ERROR)
-    
-    url = "https://www.securityweek.com/"
-    
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
-    }
-    
-    response = requests.get(url, headers=headers)
-
-    if response.status_code != 200:
-        logging.error(f"Failed to fetch data from SecurityWeek. Status code: {response.status_code}")
-        return HttpResponse('Failed to fetch data from SecurityWeek')
-    
-    soup = BeautifulSoup(response.text, 'html.parser')
-    articles = soup.find_all('div', class_='news-post')
-    article_data = []
-
-    for article in articles:
-        title_element = article.find('h2', class_='news-post-title')
-        title = title_element.a.get_text() if title_element else ''
-        link = title_element.a['href'] if title_element else ''
-
-        article_data.append({
-            'title': title,
-            'link': link,
-        })
-
-    
-    client = MongoClient('localhost', 27017)
-    db = client['news']
-    news_collection = db['securityweeks_news'] 
-    
-    for data in article_data:
-        news_collection.insert_one(data)
-
-    context = {
-        'articles': article_data,
-    }
-
-    return render(request, 'news/scrape_security.html', context)
-
-
-
-
-
-
-
-
-
-
-
-def scrape_decrypt(request):
-    url = "https://decrypt.co/"
-    response = requests.get(url)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
-        articles = soup.find_all('div', class_='article-list-item')
-        article_data = []
-
-        for article in articles:
-            title = article.find('h2', class_='article-title').get_text()
-            author = article.find('span', class_='author-name').get_text()
-            link = article.find('a')['href']
-
-            article_data.append({
-                'title': title,
-                'author': author,
-                'link': link,
-            })
-
-        context = {
-            'articles': article_data,
-        }
-
- 
-        client = MongoClient('localhost', 27017)
-        db = client['news']
-        news_collection = db['decrypt_news']
-
-        for data in article_data:
-            news_collection.insert_one(data)
-
-        return render(request, 'news/scrape_decrypt.html', context)
-    else:
-        return HttpResponse('Failed to fetch data from Decrypt')
-
-
-
-
-
-
-
-
-
-
-
+from django.http import HttpRequest
+from urllib.parse import urljoin
 
 
 
@@ -281,11 +47,73 @@ def get_news(request):
 # #         message = f"{search_term}"
 
 
-# # def index(request):
-# #     return HttpResponse('Hello, world!')
 
 
+def scrape_tech(request: HttpRequest):
+    
+    urls = [
+        'https://techcrunch.com',
+    ]
 
+    article_data = []
+    base_url = 'https://techcrunch.com'  
+
+   
+    client = MongoClient("mongodb://localhost:27017/")  
+    db = client["news"]  
+    news_collection = db["techcrunch"]  
+
+    for url in urls:
+        response = requests.get(url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            if 'techcrunch.com' in url:
+                articles = soup.find_all('div', class_='post-block')
+
+                for article in articles:
+                    title = article.find('h2').get_text()
+                    author = article.find('span', class_='river-byline__authors').get_text()
+                    article_relative_url = article.find('a')['href']
+
+                    # Check if the article URL is relative or absolute and correct accordingly
+                    if not article_relative_url.startswith('http:'):
+                        article_url = urljoin(base_url, article_relative_url)
+                    else:
+                        article_url = article_relative_url
+
+                   
+                    image_element = article.find('img')
+                    image_url = image_element['src'] if image_element else None
+
+                    # Check if the image URL is valid and if the article doesn't already exist in the collection
+                    existing_article = news_collection.find_one({'article_url': article_url})
+                    if image_url and not existing_article:
+                        article_data.append({
+                            'title': title,
+                            'author': author,
+                            'article_url': article_url,
+                            'image_url': image_url,
+                        })
+
+   # Insert the data into the MongoDB collection
+    if article_data:
+        news_collection.insert_many(article_data)
+
+        # Retrieve data from MongoDB to display in the HTML template
+    sort_option = request.GET.get('sort', '')  # Get the sorting option from the request
+    if sort_option == 'author':
+        articole = news_collection.find().sort('author', 1)  
+    elif sort_option == 'title':
+        articole = news_collection.find().sort('title', 1) 
+    else:
+        articole = news_collection.find()
+
+   
+    client.close()
+
+    
+    return render(request, 'news/test_techcrunch.html', {'articole': articole, 'sort_option': sort_option})
 
 
 

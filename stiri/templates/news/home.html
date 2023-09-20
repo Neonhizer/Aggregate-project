@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
 <head>
     <title>Stiri</title>
@@ -45,19 +45,7 @@
             }
         }
 
-        // Make an AJAX request to the server to get the news
-        $.ajax({
-            url: "/get_news/", // This is the path to the function that pulls the news from the database
-            type: "GET",
-            dataType: "json",
-            success: function (data) {
-                
-                displayNews(data);
-            },
-            error: function () {
-                console.log("Failed to fetch news data.");
-            }
-        });
+  
     });
 </script>
 </body>
