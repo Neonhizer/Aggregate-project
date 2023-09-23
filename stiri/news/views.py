@@ -38,7 +38,6 @@ def get_news(request):
     return JsonResponse(news_data)
 
 
-
 def scrape_tech(request: HttpRequest):
     
     urls = [
