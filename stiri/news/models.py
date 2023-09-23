@@ -5,6 +5,7 @@ class Article(models.Model):
     image = models.URLField(null=True, blank=True)
     author = models.CharField(max_length=100, null=True, blank=True)
     url = models.URLField(unique=True)
+    short_description = models.CharField(max_length=500)
   
 
     def __str__(self):

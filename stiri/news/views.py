@@ -4,25 +4,26 @@ from django.shortcuts import render
 from pymongo import MongoClient
 from .models import Article
 from django.http import JsonResponse
-from django.http import HttpResponse
-import pymongo
-import logging
 from django.http import HttpRequest
 from urllib.parse import urljoin
 
 
 
-
 def home(request):
-    # Fetch all the articles from the database
-    articles = Article.objects.all()
+    return render(request, 'news/home.html')
 
 
-    context = {
-        'articles': articles,
-    }
 
-    return render(request, 'news/home.html', context)
+# def home(request):
+#     # Fetch all the articles from the database
+#     articles = Article.objects.all()
+
+
+#     context = {
+#         'articles': articles,
+#     }
+
+#     return render(request, 'news/home.html', context)
 
 def get_news(request):
     # Extract all the news from the database
@@ -35,17 +36,6 @@ def get_news(request):
 
     # Return the data as JSON
     return JsonResponse(news_data)
-
-
-
-
-
-# # def search_results(request):
-# #     if'search_term' in request.GET and request.GET["search_term"]:
-# #         search_term = request.GET.get("search_term")
-# #         searched_articles = Article.search_by_title(search_term)
-# #         message = f"{search_term}"
-
 
 
 
@@ -76,6 +66,12 @@ def scrape_tech(request: HttpRequest):
                     author = article.find('span', class_='river-byline__authors').get_text()
                     article_relative_url = article.find('a')['href']
 
+
+
+                    
+                    short_description_element = article.find('div', class_='post-block__content')
+                    short_description = short_description_element.get_text()
+                    
                     # Check if the article URL is relative or absolute and correct accordingly
                     if not article_relative_url.startswith('http:'):
                         article_url = urljoin(base_url, article_relative_url)
@@ -94,7 +90,10 @@ def scrape_tech(request: HttpRequest):
                             'author': author,
                             'article_url': article_url,
                             'image_url': image_url,
+                            'short_description': short_description,
                         })
+
+               
 
    # Insert the data into the MongoDB collection
     if article_data:
@@ -113,7 +112,64 @@ def scrape_tech(request: HttpRequest):
     client.close()
 
     
-    return render(request, 'news/test_techcrunch.html', {'articole': articole, 'sort_option': sort_option})
+    return render(request, 'news/techcrunch.html', {'articole': articole, 'sort_option': sort_option})
 
 
 
+
+
+
+def scrape_thehackernews(request):
+    client = MongoClient('localhost', 27017)
+    db = client.news
+    thehackernews_collection = db.thehackernews
+
+    url = 'https://thehackernews.com'
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    articles = soup.find_all('div', class_='body-post')
+
+    # Get the search query from the GET parameters (in search)
+    search_query = request.GET.get('q', '')
+
+    
+    filtered_articles = []
+
+    for article in articles:
+        title_element = article.find('h2', class_='home-title')
+        title = title_element.text.strip() if title_element else 'N/A'
+
+        img_element = article.find('img')
+        img_url = img_element['data-src'].strip() if img_element else None
+
+        article_link = article.find('a')['href']
+
+
+
+        existing_article = thehackernews_collection.find_one({'article_url': article_link})
+        if img_url and not existing_article:
+            article_response = requests.get(article_link)
+            article_soup = BeautifulSoup(article_response.text, 'html.parser')
+            first_paragraph = article_soup.find('div', class_='articlebody').find('p')
+            short_description = first_paragraph.text.strip() if first_paragraph else 'N/A'
+
+            article_data = {
+                'title': title,
+                'img_url': img_url,
+                'link': article_link,
+                'short_description': short_description
+            }
+
+           
+            if search_query.lower() in title.lower() or search_query.lower() in short_description.lower():
+                filtered_articles.append(article_data)
+
+            try:
+                thehackernews_collection.insert_one(article_data)
+            except Exception as e:
+                print(f"Eroare la inserarea datelor: {str(e)}")
+
+    articles_data = list(thehackernews_collection.find())
+    context = {'articles_data': filtered_articles, 'search_query': search_query}
+    return render(request, 'news/thehackernews.html', context)

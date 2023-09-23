@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Articole</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        h1 {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+            margin: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        th {
+            background-color: #333;
+            color: #fff;
+            font-weight: bold;
+        }
+        td img {
+            max-width: 100%;
+            height: auto;
+        }
+        .read-more-link {
+            text-decoration: none;
+            color: #007bff;
+            transition: color 0.3s;
+        }
+        .read-more-link:hover {
+            color: #0056b3;
+        }
+        label {
+            margin: 20px;
+        }
+        select {
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Articole The Hacker News</h1>
+
+    <form method="GET" action="">
+        <label for="search">Caută articole:</label>
+        <input type="text" id="search" name="q" value="{{ search_query }}">
+        <input type="submit" value="Caută">
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Imagine</th> 
+                <th>Titlu</th>
+                <th>Scurta descriere</th>
+                <th>Detalii</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for article in articles_data %}
+                <tr>
+                    <td><img src="{{ article.img_url }}" alt="Imagine articol"></td> 
+                    <td>{{ article.title }}</td>
+                    <td>{{ article.short_description }}</td>
+                    <td><a href="{{ article.link }}" class="read-more-link" target="_blank">Citește mai mult</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

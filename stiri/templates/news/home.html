@@ -1,52 +1,47 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
-<head>
-    <title>Stiri</title>
-   
-</head>
+<title>Stiri</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<style>
+.mySlides {display:none;}
+</style>
 <body>
-<div class="jumbotron">
-    <h1>Stiri</h1>
-    <form method="POST" action="{% url 'scrape' %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-success">Actualizare stiri</button>
-    </form>
-</div>
-<div class="container">
-    <div id="news-container" class="card-columns" style="padding: 10px; margin: 20px;">
-    
-    </div>
-</div>
-<script
-    src="http://code.jquery.com/jquery-3.3.1.min.js"
-    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-    crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-        crossorigin="anonymous"></script>
-<script>
-    $(document).ready(function () {
-        //  Function to display the news in the container
-        function displayNews(newsData) {
-            var newsContainer = $("#news-container");
 
-            
-            newsContainer.empty();
+<h2 class="w3-center">Noutăți</h2>
 
-          
-            for (var i = 0; i < newsData.titles.length; i++) {
-                var newsCard = '<div class="card"><div class="card-body">';
-                newsCard += '<h5 class="card-title"><a href="' + newsData.links[i] + '">' + newsData.titles[i] + '</a></h5>';
-                newsCard += '</div></div>';
-                newsContainer.append(newsCard);
-            }
-        }
 
+<div class="w3-content w3-display-container">
+      <a href="{% url 'techcrunch' %}">
+      <img class="mySlides" src="https://clipground.com/images/techcrunch-logo-png-1.png" style="width:100%">
+    </a>
+      <a href="{% url 'thehackernews' %}">
+      <img class="mySlides" src="https://thehackernews.com/images/-AaptImXE5Y4/WzjvqBS8HtI/AAAAAAAAxSs/BcCIwpWJszILkuEbDfKZhxQJwOAD7qV6ACLcBGAs/s728-rj-e365/the-hacker-news.jpg" style="width:100%">
+    </a>
   
-    });
+    <button class="w3-button w3-black w3-display-left" onclick="plusDivs(-1)">&#10094;</button>
+    <button class="w3-button w3-black w3-display-right" onclick="plusDivs(1)">&#10095;</button>
+  </div>
+  
+<script>
+var slideIndex = 1;
+showDivs(slideIndex);
+
+function plusDivs(n) {
+  showDivs(slideIndex += n);
+}
+
+function showDivs(n) {
+  var i;
+  var x = document.getElementsByClassName("mySlides");
+  if (n > x.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = x.length}
+  for (i = 0; i < x.length; i++) {
+    x[i].style.display = "none";  
+  }
+  x[slideIndex-1].style.display = "block";  
+}
 </script>
+
 </body>
 </html>
