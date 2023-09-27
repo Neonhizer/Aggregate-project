@@ -6,10 +6,21 @@ from .models import Article
 from django.http import JsonResponse
 from django.http import HttpRequest
 from urllib.parse import urljoin
+import logging
 
+# from apscheduler.schedulers.background import BackgroundScheduler
+# from django_apscheduler.jobstores import DjangoJobStore
+# from apscheduler.triggers.interval import IntervalTrigger
+# from django_apscheduler.jobstores import register_events
+
+
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
 
 
 def home(request):
+
+    
     return render(request, 'news/home.html')
 
 
@@ -172,3 +183,161 @@ def scrape_thehackernews(request):
     articles_data = list(thehackernews_collection.find())
     context = {'articles_data': filtered_articles, 'search_query': search_query}
     return render(request, 'news/thehackernews.html', context)
+
+
+def scrape_addarticlesTECH():
+   
+
+
+        
+        client = MongoClient("mongodb://localhost:27017/")
+        db = client["news"]
+        techcrunch_collection = db["techcrunch"]
+    
+
+        
+        techcrunch_url = 'https://techcrunch.com'
+        techcrunch_articles = []
+
+        # Fetch and parse the TechCrunch webpage
+        response = requests.get(techcrunch_url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            # Extracting data from TechCrunch
+            articles = soup.find_all('div', class_='post-block')
+
+            for article in articles:
+                title = article.find('h2').get_text()
+                author = article.find('span', class_='river-byline__authors').get_text()
+                article_relative_url = article.find('a')['href']
+
+                short_description_element = article.find('div', class_='post-block__content')
+                short_description = short_description_element.get_text()
+
+                # Check if the article URL is relative or absolute and correct accordingly
+                if not article_relative_url.startswith('http:'):
+                    article_url = urljoin(techcrunch_url, article_relative_url)
+                else:
+                    article_url = article_relative_url
+
+                image_element = article.find('img')
+                image_url = image_element['src'] if image_element else None
+
+                # Check if the image URL is valid and if the article doesn't already exist in the collection
+                existing_article = techcrunch_collection.find_one({'article_url': article_url})
+                if image_url and not existing_article:
+                    techcrunch_articles.append({
+                        'title': title,
+                        'author': author,
+                        'article_url': article_url,
+                        'image_url': image_url,
+                        'short_description': short_description,
+                    })
+
+            # Insert the data into the MongoDB collection
+            if techcrunch_articles:
+                techcrunch_collection.insert_many(techcrunch_articles)
+
+            
+
+        
+        
+
+        # Close the connection to the MongoDB
+        client.close()
+       
+
+
+def scrape_addarticlesHACK ():
+
+
+    client = MongoClient("mongodb://localhost:27017/")
+    db = client["news"]
+   
+    hackernews_collection = db["thehackernews"]
+
+    hackernews_url = 'https://thehackernews.com'
+    hackernews_articles = []
+
+    
+    response = requests.get(hackernews_url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        
+        articles = soup.find_all('div', class_='body-post')
+
+        for article in articles:
+            title_element = article.find('h2', class_='home-title')
+            title = title_element.text.strip() if title_element else 'N/A'
+
+            img_element = article.find('img')
+            img_url = img_element['data-src'].strip() if img_element else None
+
+            article_link = article.find('a')['href']
+
+            existing_article = hackernews_collection.find_one({'article_url': article_link})
+            if img_url and not existing_article:
+                article_response = requests.get(article_link)
+                article_soup = BeautifulSoup(article_response.text, 'html.parser')
+                first_paragraph = article_soup.find('div', class_='articlebody').find('p')
+                short_description = first_paragraph.text.strip() if first_paragraph else 'N/A'
+
+                hackernews_articles.append({
+                    'title': title,
+                    'img_url': img_url,
+                    'link': article_link,
+                    'short_description': short_description
+                })
+
+
+        if hackernews_articles:
+            hackernews_collection.insert_many(hackernews_articles)
+
+    # Close the connection to the MongoDB
+    client.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    scrape_addarticlesHACK()
+    scrape_addarticlesTECH()
+
+
+
+
+def schedule_scrape_task():
+   
+    scheduler = BackgroundScheduler()
+    
+    # Programarea job-ului să ruleze la fiecare oră
+    trigger = IntervalTrigger(seconds=5)
+    scheduler.add_job(scrape_addarticlesTECH, trigger=trigger, id='scrape_addarticlesTECH_task')
+    scheduler.add_job(scrape_addarticlesHACK, trigger=trigger, id='scrape_addarticlesHACK_task')
+
+    scheduler.start()
+ 
+
+if __name__ == "__main__":
+    schedule_scrape_task()

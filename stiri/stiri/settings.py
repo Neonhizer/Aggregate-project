@@ -13,6 +13,17 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 from pymongo import MongoClient
 
+
+
+
+
+
+  
+ 
+
+
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -39,7 +50,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'news',
+    'django_apscheduler',
+    
+
 ]
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -138,6 +153,7 @@ def get_mongodb(alias='default'):
     db = client[config['NAME']]
     return db
 
+
 # Configuration to use PyMongo for performing migrations in Django
 DATABASES = {
     'default': {
@@ -146,6 +162,43 @@ DATABASES = {
         'ENFORCE_SCHEMA': False,
     },
 }
+
+
+
+
+
+
+
+
+APSCHEDULER_JOBSTORES = {
+    'default': {
+        'ENGINE': 'django_apscheduler.jobstores:DjangoJobStore',  
+         'OPTIONS': {
+             'database_url': 'mongodb://localhost:27017/news', 
+          
+            
+            
+         },
+    },
+}
+
+
+
+
+
+LOGGING = {  
+    "version": 1,  
+    "disable_existing_loggers": False,  
+    "handlers": {  
+        "console": {  
+            "class": "logging.StreamHandler",  
+        },  
+    },  
+    "root": {  
+        "handlers": ["console"],  
+        "level": "INFO",  
+    },  
+}  
 
 
 
